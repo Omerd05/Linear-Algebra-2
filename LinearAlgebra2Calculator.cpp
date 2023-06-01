@@ -16,7 +16,7 @@
 using namespace std;
 typedef long double Real;
 typedef long long Natrual;
-//typedef unordered_map<{Real,long long},long long>  hash_map;
+#define loop(x, n) for(int x = 0; x < n; ++ x)
 
 const Real epsilon = 1e-6;
 const Real delta = 1e-6;
@@ -291,9 +291,135 @@ struct Polynomial
     }
 };
 
+//Only for square matrix, and above R.
+
+struct Matrix { 
+    Natrual n;
+    Real det;
+    vector<vector<Real>> M; //(n,vector<Real>(n));
+
+    /*Matrix(const Matrix& mat) {
+        n = mat.n;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                M[i][j] = mat.M[i][j];
+            }
+        }
+    }*/
+
+    Matrix(Natrual sz, vector<vector<Real>> tbl) {
+        n = sz;
+        M.resize(n,vector<Real>(n));
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                M[i][j] = tbl[i][j];
+            }
+        }
+    }
+
+    void print() {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                cout << M[i][j] << " ";
+            }
+            cout << endl;
+        }
+    }
+
+    void add(Matrix Q) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                M[i][j] += Q.M[i][j];
+            }
+        }
+    }
+
+    void scalar(Real u) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                M[i][j] *= u;
+            }
+        }
+    }
+
+    Matrix transpose() {
+        vector<vector<Real>> T(n,vector<Real>(n));
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                T[i][j] = M[j][i];
+            }
+        }
+        return Matrix(n, T);
+    }
+
+    Matrix multi(Matrix B) {
+        Matrix BT = B.transpose();
+        Matrix result = Matrix(n,vector<vector<Real>>(n,vector<Real>(n,0)));
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                Real sum = 0;
+                for (int k = 0; k < n; k++) {
+                    sum += M[i][k] + BT.M[j][k];
+                }
+                result.M[i][j] = sum;
+            }
+        }
+        return result;
+    }
+
+    //swapping rows j and i.
+    void swapR(int i, int j) { 
+        for (int k = 0; k < n; k++) {
+            auto temp = M[i][k];
+            M[i][k] = M[j][k];
+            M[j][k] = temp;
+        }
+    }
+
+    //R_i <- R_i + u*R_j
+    void Rplus(int i, int j, int u) {
+        for (int k = 0; k < n; k++) {
+            M[i][k] += u*M[j][k];
+        }
+    }
+
+    Matrix reducedform() {
+        Matrix A = Matrix(n, M);
+        int i = 0;
+        for (int j = 0; j < n; j++){
+
+            int cand = i;
+            while (cand < n && A.M[cand][j] == 0)cand++;
+            if (cand == n)continue;
+            A.swapR(cand, i);
+
+            int runner = i+1;
+            while (runner < n) {
+                A.Rplus(runner, i, -1 * A.M[runner][j] / A.M[i][j]);
+                runner++;
+            }
+
+            i++;
+        }
+        return A;
+    }
+
+    void setDet() {
+        Matrix A = reducedform();
+        Real mul = 1;
+        for (int i = 0; i < n; i++) {
+            mul *= M[i][i];
+        }
+        det = mul;
+    }
+};
+
 int main()
 {
-    auto p = Polynomial("-4x^0 + 1x^2");
-    p.Print();
-    cout << p.rootFinder(p) << endl;
+    //vector<vector<Real>> tbl = { {1,2,3},{4,5,6},{7,8,8} };
+    //Matrix A = Matrix(3, tbl);
+    //A.reducedform().print();
+    //auto p = Polynomial("-4x^0 + 1x^2");
+    //p.Print();
+    //cout << p.rootFinder(p) << endl;
 }
