@@ -1,5 +1,5 @@
 # Linear-Algebra-2
-A C++ program that implements all the algorithms studied in the course Linear Algebra 2 studied in Tel-Aviv university and more. 
+A C++ program that implements algorithms studied in the course Linear Algebra 2 studied in Tel-Aviv university and more. 
 
 To this moment when I'm writing this file (31/5/2023), the project ISN'T over yet as there is a lot more to do : 
 
